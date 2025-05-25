@@ -1,6 +1,23 @@
 export const chipDisplay = (function () {
     let canvas;
 
+    const colors = {
+        on: "#ffa31a",
+        off: "#262626",
+    };
+
+    const rows = 32;
+    const cols = 64;
+
+    // Display grid 64x32
+    // Each pixel is represented by a 0 or a 1
+    // Indicating if it's on or off
+    let arrayDisplay = Array(32)
+        .fill()
+        .map(() => {
+            return Array(64).fill(0);
+        });
+
     function setupCanvas() {
         const scaleFactor = 15;
         const WIDTH = 64;
@@ -19,27 +36,58 @@ export const chipDisplay = (function () {
         canvas.style.imageRendering = "pixelated";
         canvas.style.imageRendering = "crisp-edges";
         canvas.style.border = "2px solid #333";
-        canvas.style.background = "black";
+        canvas.style.background = colors.off;
 
         return canvas;
     }
 
-    function drawPixel(x, y) {
-        console.log(canvas.width);
-        console.log(canvas.height);
+    function resetDisplay() {
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                arrayDisplay[i][j] = 0;
+            }
+        }
+    }
 
+    function setPixelOnOrOff(x, y, onOrOff) {
+        arrayDisplay[y][x] = onOrOff;
+    }
+
+    function updateDisplay() {
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                if (arrayDisplay[i][j] === 1) {
+                    drawPixel(j, i, true);
+                } else {
+                    drawPixel(j, i, false);
+                }
+            }
+        }
+    }
+
+    function drawPixel(x, y, isItOn) {
         const ctx = canvas.getContext("2d");
+        let color;
 
-        // Draw a test pattern to see the scaling
-        ctx.fillStyle = "#0F0"; // CHIP-8 green
+        if (isItOn) {
+            color = colors.on;
+        } else {
+            color = colors.off;
+        }
+
+        ctx.fillStyle = color;
         ctx.fillRect(x, y, 1, 1);
     }
 
     return {
         init: function (container) {
+            resetDisplay();
             canvas = setupCanvas();
             container.appendChild(canvas);
         },
         drawPixel,
+        resetDisplay,
+        updateDisplay,
+        setPixelOnOrOff,
     };
 })();
