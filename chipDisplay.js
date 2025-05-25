@@ -47,10 +47,11 @@ export const chipDisplay = (function () {
                 arrayDisplay[i][j] = 0;
             }
         }
+        updateDisplay();
     }
 
     function setPixelOnOrOff(x, y, onOrOff) {
-        arrayDisplay[y][x] = onOrOff;
+        arrayDisplay[y][x] = onOrOff ? 1 : 0;
     }
 
     function updateDisplay() {
@@ -81,9 +82,9 @@ export const chipDisplay = (function () {
 
     return {
         init: function (container) {
-            resetDisplay();
             canvas = setupCanvas();
             container.appendChild(canvas);
+            resetDisplay();
         },
         drawPixel,
         resetDisplay,
