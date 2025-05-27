@@ -20,8 +20,8 @@ export const chipDisplay = (function () {
 
     function setupCanvas() {
         const scaleFactor = 15;
-        const WIDTH = 64;
-        const HEIGHT = 32;
+        const WIDTH = cols;
+        const HEIGHT = rows;
         const realWidth = WIDTH * scaleFactor;
         const realHeight = HEIGHT * scaleFactor;
 
@@ -80,6 +80,73 @@ export const chipDisplay = (function () {
         ctx.fillRect(x, y, 1, 1);
     }
 
+    function renderSprites(x, y, spriteArray) {
+        // Takes an array of bytes representing a sprite
+        // if it has 5 elements, the sprite is 8x5
+        // x, y represent the initial coordinates to start drawing the sprite from
+        // sprites always have 8 bits of width
+
+        // TO-DO if x is bigger that 64 and y bigger than 32, wrap around the display
+        // as a way of handling it.
+
+        // if x or y origin coordinates surpasses rightwards
+        // or downwards limits return
+        if (x >= 64 || y >= 32) {
+            return;
+        }
+
+        // calculate end of the row to check if surpasses rightwards edge
+        const endOfRow = x + 8;
+        let rowLength = 8;
+        if (endOfRow >= 64) {
+            // if so calculate allowable row length to place in the display
+            // set row length
+            rowLength = 64 - x;
+        }
+
+        // TO-DO when the row exceeds the edge of the screen rightwards or downwards break.
+        for (let i = 0; i < spriteArray.length; i++) {
+            // take current state of the display row that's going to be updated
+            const screen8bitRow = arrayDisplay[y].slice(x, x + rowLength);
+
+            // turn the array into a string, add padding until its 8 bits and then turn it
+            //  into the decimal representaion of that binary sequence
+            const screen8bitRowNum = parseInt(
+                screen8bitRow.join("").padEnd(8, "0"),
+                2
+            );
+
+            // execute an XOR operation to determine the new state of that 8 pixel row
+            const binaryRowRepresentation = screen8bitRowNum ^ spriteArray[i]; // REPLACE SPRITE ARRAY WITH ROW LENGHT
+
+            // turn the new state to a 8 bit binary string
+            const binaryRowStringRepresentation = intToBinaryString(
+                binaryRowRepresentation
+            );
+
+            // parse the binary string and update the arrayDisplay
+            for (let j = 0; j < rowLength; j++) {
+                arrayDisplay[y][x + j] = Number(
+                    binaryRowStringRepresentation[j]
+                );
+            }
+            updateDisplay();
+            // Increase Y coordinates
+            y++;
+            // if height surpasses downwards display edge, break.
+            if (y >= 32) {
+                break;
+            }
+        }
+    }
+
+    function intToBinaryString(number) {
+        const binaryString = number.toString(2);
+        return binaryString.padStart(8, "0");
+    }
+
+    function test() {}
+
     return {
         init: function (container) {
             canvas = setupCanvas();
@@ -90,5 +157,7 @@ export const chipDisplay = (function () {
         resetDisplay,
         updateDisplay,
         setPixelOnOrOff,
+        renderSprites,
+        test,
     };
 })();
