@@ -86,14 +86,11 @@ export const chipDisplay = (function () {
         // x, y represent the initial coordinates to start drawing the sprite from
         // sprites always have 8 bits of width
 
-        // TO-DO if x is bigger that 64 and y bigger than 32, wrap around the display
-        // as a way of handling it.
-
-        // if x or y origin coordinates surpasses rightwards
-        // or downwards limits return
-        if (x >= 64 || y >= 32) {
-            return;
-        }
+        // if x is greater than or equal to 64
+        // or y is greater than or equal to 32
+        // we perform the modulo to wrap the coordinates around
+        x = x >= 64 ? x % 64 : x;
+        y = y >= 32 ? y % 32 : y;
 
         // calculate end of the row to check if surpasses rightwards edge
         const endOfRow = x + 8;
