@@ -86,6 +86,9 @@ export const chipDisplay = (function () {
         // x, y represent the initial coordinates to start drawing the sprite from
         // sprites always have 8 bits of width
 
+        // Once there's been a collision, no need to check for more
+        let isThereACollision = false;
+
         // if x is greater than or equal to 64
         // or y is greater than or equal to 32
         // we perform the modulo to wrap the coordinates around
@@ -101,20 +104,29 @@ export const chipDisplay = (function () {
             rowLength = 64 - x;
         }
 
-        // TO-DO when the row exceeds the edge of the screen rightwards or downwards break.
         for (let i = 0; i < spriteArray.length; i++) {
             // take current state of the display row that's going to be updated
             const screen8bitRow = arrayDisplay[y].slice(x, x + rowLength);
 
-            // turn the array into a string, add padding until its 8 bits and then turn it
+            // turn the array into a string
+            const screen8bitRowString = screen8bitRow.join("");
+            // check for collisions
+            if (!isThereACollision) {
+                const spriteRowString = intToBinaryString(spriteArray[i]);
+                isThereACollision = checkForCollision(
+                    spriteRowString,
+                    screen8bitRowString
+                );
+            }
+            // add padding until its 8 bits and then turn it
             //  into the decimal representaion of that binary sequence
             const screen8bitRowNum = parseInt(
-                screen8bitRow.join("").padEnd(8, "0"),
+                screen8bitRowString.padEnd(8, "0"),
                 2
             );
 
             // execute an XOR operation to determine the new state of that 8 pixel row
-            const binaryRowRepresentation = screen8bitRowNum ^ spriteArray[i]; // REPLACE SPRITE ARRAY WITH ROW LENGHT
+            const binaryRowRepresentation = screen8bitRowNum ^ spriteArray[i];
 
             // turn the new state to a 8 bit binary string
             const binaryRowStringRepresentation = intToBinaryString(
@@ -127,7 +139,7 @@ export const chipDisplay = (function () {
                     binaryRowStringRepresentation[j]
                 );
             }
-            updateDisplay();
+            // Render rows
             // Increase Y coordinates
             y++;
             // if height surpasses downwards display edge, break.
@@ -135,6 +147,26 @@ export const chipDisplay = (function () {
                 break;
             }
         }
+
+        // Render sprite --> DISABLED, just update the display buffer
+        // The buffer will be rendered after each tick when the draw flag
+        // is set to true
+        /* updateDisplay(); */
+
+        return isThereACollision;
+    }
+
+    function checkForCollision(spriteRowString, screenRowString) {
+        spriteRowString = spriteRowString.slice(0, screenRowString.length);
+        for (let i = 0; i < spriteRowString.length; i++) {
+            if (
+                Number(spriteRowString[i]) === 1 &&
+                Number(screenRowString[i]) === 1
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function intToBinaryString(number) {
