@@ -339,11 +339,13 @@ const chipEmulator = (function () {
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] &
                             generalPurposeRegisters[thirdNibble];
+                        break;
                     case 0x0003:
                         // 8XY3: vX is set to the xor operation of vX and vY
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] ^
                             generalPurposeRegisters[thirdNibble];
+                        break;
                     case 0x0004:
                         // 8XY4: vX is set to the value of vX plus the value of vY. vF is set to
                         // 1 if the value overflows 255, otherwise it is set to 0
@@ -354,6 +356,31 @@ const chipEmulator = (function () {
                         generalPurposeRegisters[secondNibble] = addition & 0xff;
                         // set vF flag
                         generalPurposeRegisters[0xf] = addition > 255 ? 1 : 0;
+                        break;
+                    case 0x0005:
+                        // 8XY5: sets vX to the result of vX - vY.
+                        generalPurposeRegisters[secondNibble] =
+                            (generalPurposeRegisters[secondNibble] -
+                                generalPurposeRegisters[thirdNibble]) &
+                            0xff;
+                        generalPurposeRegisters[0xf] =
+                            generalPurposeRegisters[secondNibble] >=
+                            generalPurposeRegisters[thirdNibble]
+                                ? 1
+                                : 0;
+                        break;
+                    case 0x0007:
+                        // 8XY7: sets vX to the result of vY - vX.
+                        generalPurposeRegisters[secondNibble] =
+                            (generalPurposeRegisters[thirdNibble] -
+                                generalPurposeRegisters[secondNibble]) &
+                            0xff;
+                        generalPurposeRegisters[0xf] =
+                            generalPurposeRegisters[thirdNibble] >=
+                            generalPurposeRegisters[secondNibble]
+                                ? 1
+                                : 0;
+                        break;
                     default:
                         break;
                 }
