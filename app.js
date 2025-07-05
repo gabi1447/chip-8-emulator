@@ -324,26 +324,36 @@ const chipEmulator = (function () {
             case 0x8000:
                 switch (opcode & 0x000f) {
                     case 0x0000:
-                        // 8XY0 vX is set to vY.
+                        // 8XY0: vX is set to vY.
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[thirdNibble];
                         break;
                     case 0x0001:
-                        // 8XY1 vX is set to the or operation of vX and vY.
+                        // 8XY1: vX is set to the or operation of vX and vY.
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] |
                             generalPurposeRegisters[thirdNibble];
                         break;
                     case 0x0002:
-                        // 8XY2 vX is set to the and operation of vX and vY
+                        // 8XY2: vX is set to the and operation of vX and vY
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] &
                             generalPurposeRegisters[thirdNibble];
                     case 0x0003:
-                        // 8XY3 vX is set to the xor operation of vX and vY
+                        // 8XY3: vX is set to the xor operation of vX and vY
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] ^
                             generalPurposeRegisters[thirdNibble];
+                    case 0x0004:
+                        // 8XY4: vX is set to the value of vX plus the value of vY. vF is set to
+                        // 1 if the value overflows 255, otherwise it is set to 0
+                        const addition =
+                            generalPurposeRegisters[secondNibble] +
+                            generalPurposeRegisters[thirdNibble];
+                        // keep only first 8 bits in the vX register
+                        generalPurposeRegisters[secondNibble] = addition & 0xff;
+                        // set vF flag
+                        generalPurposeRegisters[0xf] = addition > 255 ? 1 : 0;
                     default:
                         break;
                 }
