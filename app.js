@@ -324,7 +324,12 @@ const chipEmulator = (function () {
             case 0x8000:
                 switch (opcode & 0x000f) {
                     case 0x0000:
-                        // 8XY0 vX is set to the or operation of vX and vY.
+                        // 8XY0 vX is set to vY.
+                        generalPurposeRegisters[secondNibble] =
+                            generalPurposeRegisters[thirdNibble];
+                        break;
+                    case 0x0001:
+                        // 8XY1 vX is set to the or operation of vX and vY.
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] |
                             generalPurposeRegisters[thirdNibble];
@@ -521,7 +526,7 @@ function main() {
 
         // update delay timer and sound timer
         chipEmulator.updateTimers();
-    }, 1000);
+    }, 1000 / 60);
 
     /* for (;;) {
         // Emulate one cycle
