@@ -232,6 +232,11 @@ const chipEmulator = (function () {
         // Fetch opcode
         opcode = (memory[pc] << 8) | memory[pc + 1];
 
+        const firstNibble = (opcode & 0xf000) >> 12;
+        const secondNibble = (opcode & 0x0f00) >> 8;
+        const thirdNibble = (opcode & 0x00f0) >> 4;
+        const fourthNibble = opcode & 0x000f;
+
         /* console.log(`Instruction: ${opcode.toString(16).padStart(4, "0")}`); */
 
         // Filter instructions by first nibble for handling purporses
@@ -316,6 +321,17 @@ const chipEmulator = (function () {
                     opcode & 0x00ff;
                 incrementPcByNumber(2);
                 break;
+            case 0x8000:
+                switch (opcode & 0x000f) {
+                    case 0x0000:
+                        // 8XY0 vX is set to the or operation of vX and vY.
+                        generalPurposeRegisters[secondNibble] =
+                            generalPurposeRegisters[secondNibble] |
+                            generalPurposeRegisters[thirdNibble];
+                        break;
+                    default:
+                        break;
+                }
             case 0x9000:
                 // 9XY0: Skips if vX and vY are not equal
                 if (
