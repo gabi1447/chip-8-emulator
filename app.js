@@ -334,6 +334,16 @@ const chipEmulator = (function () {
                             generalPurposeRegisters[secondNibble] |
                             generalPurposeRegisters[thirdNibble];
                         break;
+                    case 0x0002:
+                        // 8XY2 vX is set to the and operation of vX and vY
+                        generalPurposeRegisters[secondNibble] =
+                            generalPurposeRegisters[secondNibble] &
+                            generalPurposeRegisters[thirdNibble];
+                    case 0x0003:
+                        // 8XY3 vX is set to the xor operation of vX and vY
+                        generalPurposeRegisters[secondNibble] =
+                            generalPurposeRegisters[secondNibble] ^
+                            generalPurposeRegisters[thirdNibble];
                     default:
                         break;
                 }
