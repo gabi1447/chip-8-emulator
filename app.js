@@ -248,7 +248,9 @@ const chipEmulator = (function () {
                         // Decrement stack pointer
                         sp--;
                         // Pop address from stack and set the pc to it to continue program flow
-                        pc = stack.pop();
+                        // after subroutine call
+                        pc = stack[sp];
+                        stack[sp] = 0;
                         incrementPcByNumber(2);
                         break;
                     default:
@@ -271,6 +273,36 @@ const chipEmulator = (function () {
                 // set program counter to subroutine address
                 pc = subroutineAddress;
                 break;
+            case 0x3000:
+                // 3XNN: Skips next instruction if vX is equal NN.
+                if (
+                    generalPurposeRegisters[(opcode & 0x0f00) >> 8] ===
+                    (opcode & 0x00ff)
+                ) {
+                    incrementPcByNumber(2);
+                }
+                incrementPcByNumber(2);
+                break;
+            case 0x4000:
+                // 4XNN: Skips next instruction if vX doesn't equal NN.
+                if (
+                    generalPurposeRegisters[(opcode & 0x0f00) >> 8] !==
+                    (opcode & 0x00ff)
+                ) {
+                    incrementPcByNumber(2);
+                }
+                incrementPcByNumber(2);
+                break;
+            case 0x5000:
+                // 5XY0: Skips next instruction if vX and vY are equal
+                if (
+                    generalPurposeRegisters[(opcode & 0x0f00) >> 8] ===
+                    generalPurposeRegisters[(opcode & 0x00f0) >> 4]
+                ) {
+                    incrementPcByNumber(2);
+                }
+                incrementPcByNumber(2);
+                break;
             case 0x6000:
                 // 6XNN: Set Vx register to NN
                 generalPurposeRegisters[(opcode & 0x0f00) >> 8] =
@@ -282,6 +314,16 @@ const chipEmulator = (function () {
                 // 7XNN: Add the value of NN to Vx
                 generalPurposeRegisters[(opcode & 0x0f00) >> 8] +=
                     opcode & 0x00ff;
+                incrementPcByNumber(2);
+                break;
+            case 0x9000:
+                // 9XY0: Skips if vX and vY are not equal
+                if (
+                    generalPurposeRegisters[(opcode & 0x0f00) >> 8] !==
+                    generalPurposeRegisters[(opcode & 0x00f0) >> 4]
+                ) {
+                    incrementPcByNumber(2);
+                }
                 incrementPcByNumber(2);
                 break;
             case 0xa000:
@@ -449,7 +491,7 @@ function main() {
 
     // Initialize the Chip8 system and load the game into the memory
     chipEmulator.init();
-    chipEmulator.loadRomIntoMemory("ibm");
+    chipEmulator.loadRomIntoMemory("test_opcode");
 
     // Emulation loop
     setInterval(() => {
