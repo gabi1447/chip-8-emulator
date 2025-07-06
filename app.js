@@ -493,6 +493,21 @@ const chipEmulator = (function () {
                         delayTimer = generalPurposeRegisters[secondNibble];
                         incrementPcByNumber(2);
                         break;
+                    case 0x0033:
+                        // FX33: Store decimals of vX in memory locations I, I+1, I+2
+                        const number = generalPurposeRegisters[secondNibble];
+                        const decimalsArray = number
+                            .toString()
+                            .padStart(3, "0")
+                            .split("");
+                        const arrayOfNumbers = decimalsArray.map(
+                            (numString) => {
+                                return Number(numString);
+                            }
+                        );
+                        memory.set(arrayOfNumbers, I);
+                        incrementPcByNumber(2);
+                        break;
                     case 0x0055:
                         // FX55: Store registers v0 through vX in memory starting at location I
                         const v0tovXArray = generalPurposeRegisters.slice(
