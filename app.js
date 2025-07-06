@@ -327,24 +327,28 @@ const chipEmulator = (function () {
                         // 8XY0: vX is set to vY.
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[thirdNibble];
+                        incrementPcByNumber(2);
                         break;
                     case 0x0001:
                         // 8XY1: vX is set to the or operation of vX and vY.
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] |
                             generalPurposeRegisters[thirdNibble];
+                        incrementPcByNumber(2);
                         break;
                     case 0x0002:
                         // 8XY2: vX is set to the and operation of vX and vY
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] &
                             generalPurposeRegisters[thirdNibble];
+                        incrementPcByNumber(2);
                         break;
                     case 0x0003:
                         // 8XY3: vX is set to the xor operation of vX and vY
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[secondNibble] ^
                             generalPurposeRegisters[thirdNibble];
+                        incrementPcByNumber(2);
                         break;
                     case 0x0004:
                         // 8XY4: vX is set to the value of vX plus the value of vY. vF is set to
@@ -356,6 +360,7 @@ const chipEmulator = (function () {
                         generalPurposeRegisters[secondNibble] = addition & 0xff;
                         // set vF flag
                         generalPurposeRegisters[0xf] = addition > 255 ? 1 : 0;
+                        incrementPcByNumber(2);
                         break;
                     case 0x0005:
                         // 8XY5: sets vX to the result of vX - vY.
@@ -368,6 +373,7 @@ const chipEmulator = (function () {
                             generalPurposeRegisters[thirdNibble]
                                 ? 1
                                 : 0;
+                        incrementPcByNumber(2);
                         break;
                     case 0x0006:
                         // 8XY6: Set vX = vY shift right by one bit (divide by two)
@@ -381,6 +387,7 @@ const chipEmulator = (function () {
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[thirdNibble] >> 1;
                         // TODO Modern implementation
+                        incrementPcByNumber(2);
                         break;
                     case 0x0007:
                         // 8XY7: sets vX to the result of vY - vX.
@@ -393,6 +400,7 @@ const chipEmulator = (function () {
                             generalPurposeRegisters[secondNibble]
                                 ? 1
                                 : 0;
+                        incrementPcByNumber(2);
                         break;
                     case 0x000e:
                         // 8XYE: Set vX = vY shift left by one bit (multiply by two)
@@ -406,6 +414,7 @@ const chipEmulator = (function () {
                         generalPurposeRegisters[secondNibble] =
                             generalPurposeRegisters[thirdNibble] << 1;
                         // TODO Modern implementation
+                        incrementPcByNumber(2);
                         break;
                     default:
                         break;
@@ -478,11 +487,38 @@ const chipEmulator = (function () {
 
                 break;
             case 0xf000:
-                // 0xFX0A Wait for a key press, store the key value in Vx (blocks until key is pressed)
-                const registerVx = (opcode & 0x0f00) >> 8;
-                waitForKeyPress(registerVx);
-                incrementPcByNumber(2);
-                break;
+                switch (opcode & 0x00ff) {
+                    case 0x0015:
+                        // FX15: Set delay timer = vX
+                        delayTimer = generalPurposeRegisters[secondNibble];
+                        incrementPcByNumber(2);
+                        break;
+                    case 0x0055:
+                        // FX55: Store registers v0 through vX in memory starting at location I
+                        const v0tovXArray = generalPurposeRegisters.slice(
+                            0,
+                            secondNibble + 1
+                        );
+                        memory.set(v0tovXArray, I);
+                        incrementPcByNumber(2);
+                        break;
+                    case 0x0065:
+                        // FX65: Read registers v0 through vX from memory starting at location I.
+                        const i0toiXArray = memory.slice(
+                            I,
+                            I + secondNibble + 1
+                        );
+                        generalPurposeRegisters.set(i0toiXArray, 0);
+                        incrementPcByNumber(2);
+                        break;
+                    case 0x000a:
+                        // FX0A: Wait for a key press, store the key value in Vx (blocks until key is pressed)
+                        const registerVx = (opcode & 0x0f00) >> 8;
+                        waitForKeyPress(registerVx);
+                        incrementPcByNumber(2);
+                        break;
+                }
+
             default:
                 // do nothing in case the opcode doesn't match anyone
                 // provided on the list
@@ -490,7 +526,7 @@ const chipEmulator = (function () {
         }
     }
 
-    function fetchCode() {
+    /* function fetchCode() {
         const instructionsPerTick = 10;
         let counter = 0;
         for (let i = 0; i < instructionsPerTick; i++) {
@@ -503,7 +539,7 @@ const chipEmulator = (function () {
             counter++;
             incrementPcByNumber(2);
         }
-    }
+    } */
 
     function runInstructionsPerTick() {
         for (let i = 0; i < INSTRUCTIONS_PER_TICK; i++) {
@@ -567,7 +603,6 @@ const chipEmulator = (function () {
         loadRomIntoMemory,
         setVfFlag,
         printVfFlag,
-        fetchCode,
         updateTimers,
         checkDrawFlag,
         setDrawFlag,
