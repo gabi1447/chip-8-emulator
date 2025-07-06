@@ -369,6 +369,19 @@ const chipEmulator = (function () {
                                 ? 1
                                 : 0;
                         break;
+                    case 0x0006:
+                        // 8XY6: Set vX = vY shift right by one bit (divide by two)
+
+                        // CAREFUL this instruction has different implementations
+                        //  for chip 8 and super chip 8 interpreters
+
+                        // chip 8 implementation
+                        generalPurposeRegisters[0xf] =
+                            generalPurposeRegisters[thirdNibble] & 0x1;
+                        generalPurposeRegisters[secondNibble] =
+                            generalPurposeRegisters[thirdNibble] >> 1;
+                        // TODO Modern implementation
+                        break;
                     case 0x0007:
                         // 8XY7: sets vX to the result of vY - vX.
                         generalPurposeRegisters[secondNibble] =
@@ -380,6 +393,19 @@ const chipEmulator = (function () {
                             generalPurposeRegisters[secondNibble]
                                 ? 1
                                 : 0;
+                        break;
+                    case 0x000e:
+                        // 8XYE: Set vX = vY shift left by one bit (multiply by two)
+
+                        // CAREFUL this instruction has different implementations
+                        // for chip 8 and super chip 8 interpreters
+
+                        // chip 8 implementation
+                        generalPurposeRegisters[0xf] =
+                            (generalPurposeRegisters[thirdNibble] >> 7) & 0x1;
+                        generalPurposeRegisters[secondNibble] =
+                            generalPurposeRegisters[thirdNibble] << 1;
+                        // TODO Modern implementation
                         break;
                     default:
                         break;
