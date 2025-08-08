@@ -17,20 +17,16 @@ h1 {
     margin-bottom: 100px;
 }
 
-.container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
 .wrapper {
     margin-top: 30px;
+    gap: 1rem;
+}
+
+.container,
+.wrapper {
     width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
 }
