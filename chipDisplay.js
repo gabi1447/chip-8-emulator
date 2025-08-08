@@ -47,7 +47,6 @@ export const chipDisplay = (function () {
                 arrayDisplay[i][j] = 0;
             }
         }
-        updateDisplay();
     }
 
     function setPixelOnOrOff(x, y, onOrOff) {
@@ -80,7 +79,7 @@ export const chipDisplay = (function () {
         ctx.fillRect(x, y, 1, 1);
     }
 
-    function renderSprites(x, y, spriteArray) {
+    /* function renderSprites(x, y, spriteArray) {
         // Takes an array of bytes representing a sprite
         // if it has 5 elements, the sprite is 8x5
         // x, y represent the initial coordinates to start drawing the sprite from
@@ -148,15 +147,32 @@ export const chipDisplay = (function () {
             }
         }
 
-        // Render sprite --> DISABLED, just update the display buffer
-        // The buffer will be rendered after each tick when the draw flag
-        // is set to true
-        /* updateDisplay(); */
-
         return isThereACollision;
+    } */
+
+    function renderSprites(x, y, spriteArray) {
+        let pixel;
+        const height = spriteArray.length;
+        let collision = false;
+
+        for (let yLine = 0; yLine < height; yLine++) {
+            pixel = spriteArray[yLine];
+            for (let xLine = 0; xLine < 8; xLine++) {
+                if ((pixel & (0x80 >> xLine)) !== 0) {
+                    const row = (y + yLine) % 32;
+                    const col = (x + xLine) % 64;
+                    if (arrayDisplay[row][col] === 1) {
+                        collision = true;
+                    }
+                    arrayDisplay[row][col] ^= 1;
+                }
+            }
+        }
+
+        return collision;
     }
 
-    function checkForCollision(spriteRowString, screenRowString) {
+    /*     function checkForCollision(spriteRowString, screenRowString) {
         spriteRowString = spriteRowString.slice(0, screenRowString.length);
         for (let i = 0; i < spriteRowString.length; i++) {
             if (
@@ -172,13 +188,13 @@ export const chipDisplay = (function () {
     function intToBinaryString(number) {
         const binaryString = number.toString(2);
         return binaryString.padStart(8, "0");
-    }
-
-    function test() {}
+    } */
 
     return {
         init: function (container) {
             canvas = setupCanvas();
+            // reset container content
+            container.textContent = "";
             container.appendChild(canvas);
             resetDisplay();
         },
@@ -187,6 +203,6 @@ export const chipDisplay = (function () {
         updateDisplay,
         setPixelOnOrOff,
         renderSprites,
-        test,
+        arrayDisplay,
     };
 })();
