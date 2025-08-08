@@ -8,20 +8,29 @@ body {
     width: 100vw;
     height: 100vh;
     overflow-x: hidden;
-    padding: 10px;
     font-family: "Courier New", Courier, monospace;
 }
 
 h1 {
     text-align: center;
     font-size: clamp(2rem, 6vh, 5rem);
+    margin-bottom: 100px;
 }
 
-.wrapper {
+.container {
     width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.wrapper {
+    margin-top: 30px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 }
