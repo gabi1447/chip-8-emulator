@@ -116,6 +116,15 @@ const chipEmulator = (function () {
     let waitingForKey = false;
     let waitingRegister = null;
 
+    function resetEventListener() {
+        const resetButton = document.querySelector(".resetButton");
+
+        resetButton.addEventListener("click", (e) => {
+            const currentRom = document.getElementById("roms").value;
+            main(currentRom);
+        });
+    }
+
     function addRomChangeEventListener() {
         const selectRoms = document.getElementById("roms");
 
@@ -129,6 +138,7 @@ const chipEmulator = (function () {
 
     function addEventListeners() {
         if (listenersAdded) return;
+        resetEventListener();
         addKeyboardEventListeners();
         addRomChangeEventListener();
         listenersAdded = true;
