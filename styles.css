@@ -14,12 +14,46 @@ body {
 h1 {
     text-align: center;
     font-size: clamp(2rem, 6vh, 5rem);
-    margin-bottom: 100px;
+    margin-bottom: 20px;
 }
 
 .wrapper {
     margin-top: 30px;
     gap: 1rem;
+}
+
+.keypadsContainer {
+    display: flex;
+    margin-top: 2rem;
+    align-items: center;
+    gap: 4rem;
+}
+
+.keyboardContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 1rem;
+    font-size: 2rem;
+    min-width: 250px;
+    max-width: 250px;
+}
+
+.key {
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: #262626;
+    color: white;
+    padding: 5px;
+    text-align: center;
 }
 
 .container,
@@ -29,4 +63,12 @@ h1 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+#roms {
+    margin-top: 2rem;
+}
+
+.arrow {
+    font-size: 3rem;
 }
