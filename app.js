@@ -76,22 +76,10 @@ const chipEmulator = (function () {
 
     // prettier-ignore
     const keyMap = {
-        '1': 0x1,
-        '2': 0x2,
-        '3': 0x3,
-        '4': 0xC,
-        'q': 0x4,
-        'w': 0x5,
-        'e': 0x6,
-        'r': 0xD,
-        'a': 0x7,
-        's': 0x8,
-        'd': 0x9,
-        'f': 0xE,
-        'z': 0xA,
-        'x': 0x0,
-        'c': 0xB,
-        'v': 0xF
+        '1': 0x1, '2': 0x2, '3': 0x3, '4': 0xC,
+        'q': 0x4, 'w': 0x5, 'e': 0x6, 'r': 0xD,
+        'a': 0x7, 's': 0x8, 'd': 0x9, 'f': 0xE,
+        'z': 0xA, 'x': 0x0, 'c': 0xB, 'v': 0xF
     }
 
     // Keyboard event listeners
@@ -168,6 +156,10 @@ const chipEmulator = (function () {
         /* keys = new Uint8Array(16).fill(false); */
 
         addEventListeners();
+
+        // Reset key wait state
+        waitingForKey = false;
+        waitingRegister = null;
 
         // Reset drawFlag NOT NECESSARY??
         drawFlag = false;
@@ -346,9 +338,9 @@ const chipEmulator = (function () {
 
                         // chip 8 implementation
                         generalPurposeRegisters[0xf] =
-                            generalPurposeRegisters[thirdNibble] & 0x1;
+                            generalPurposeRegisters[secondNibble] & 0x1;
                         generalPurposeRegisters[secondNibble] =
-                            generalPurposeRegisters[thirdNibble] >> 1;
+                            generalPurposeRegisters[secondNibble] >> 1;
                         // TODO Modern implementation
                         break;
                     case 0x0007:
@@ -371,9 +363,9 @@ const chipEmulator = (function () {
 
                         // chip 8 implementation
                         generalPurposeRegisters[0xf] =
-                            (generalPurposeRegisters[thirdNibble] >> 7) & 0x1;
+                            (generalPurposeRegisters[secondNibble] >> 7) & 0x1;
                         generalPurposeRegisters[secondNibble] =
-                            generalPurposeRegisters[thirdNibble] << 1;
+                            generalPurposeRegisters[secondNibble] << 1;
                         // TODO Modern implementation
                         break;
                     default:
